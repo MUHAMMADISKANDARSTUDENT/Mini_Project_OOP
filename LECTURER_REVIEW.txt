@@ -1,0 +1,4 @@
+Repository accessed and reviewed by the course lecturer.
+
+Take note: 
+Please add .gitignore. Get the instructions in eLearning.
