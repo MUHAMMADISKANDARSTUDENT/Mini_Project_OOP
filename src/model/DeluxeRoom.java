@@ -2,27 +2,31 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package hotelreservation.model;
+package model;
 
 public class DeluxeRoom extends HotelRoom {
 
-    public DeluxeRoom(int roomId, String roomNumber,
-                      double price, boolean available) {
+    private String bedType;
+    private int maxOccupancy;
+    private String extraService;
 
-        super(roomId, roomNumber, price, available);
+    public DeluxeRoom(String roomId, String roomNumber, double basePrice,
+                      String bedType, int maxOccupancy, String extraService) {
+        super(roomId, roomNumber, basePrice);
+        this.bedType = bedType;
+        this.maxOccupancy = maxOccupancy;
+        this.extraService = extraService;
     }
 
     @Override
-    public double calculatePrice(int nights) {
-        double basePrice = getPrice() * nights;
-
-        // Example: 10% extra for deluxe room
-        return basePrice * 1.10;
+    public double calculatePrice() {
+        return basePrice * 1.20;
     }
 
-    @Override
-    public String toString() {
-        return "Deluxe Room - " + getRoomNumber()
-                + " - RM" + getPrice();
+    public String getDetails() {
+        return "Deluxe Room - " + roomNumber
+                + ", Bed Type: " + bedType
+                + ", Max Occupancy: " + maxOccupancy
+                + ", Extra Service: " + extraService;
     }
 }
