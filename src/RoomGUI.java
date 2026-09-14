@@ -2,13 +2,13 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class CustomerGUI extends JFrame {
+public class RoomGUI extends JFrame {
 
     private JTextField userIdField, nameField, emailField, phoneField;
     private JTable userTable;
     private DefaultTableModel tableModel;
 
-    public CustomerGUI() {
+    public RoomGUI() {
         setTitle("Hotel Reservation System - User Management");
         setSize(850, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
