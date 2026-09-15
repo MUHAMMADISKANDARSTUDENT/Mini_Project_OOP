@@ -4,102 +4,93 @@ import database.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 
 public class ReservationDAO {
 
     // CREATE
-    public boolean addReservation(String reservationId, String userId,
-                                  String reservationDate, String checkInDate,
-                                  String checkOutDate, String status,
-                                  double totalAmount) {
+    public void addReservation(String reservationId, String userId,
+                               String reservationDate, String checkInDate,
+                               String checkOutDate, String status,
+                               double totalAmount) {
 
-        String sql = "INSERT INTO reservations "
-                + "(reservation_id, user_id, reservation_date, check_in_date, "
-                + "check_out_date, status, total_amount) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations " +
+                "(reservation_id, user_id, reservation_date, check_in_date, " +
+                "check_out_date, status, total_amount) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, reservationId);
-            stmt.setString(2, userId);
-            stmt.setString(3, reservationDate);
-            stmt.setString(4, checkInDate);
-            stmt.setString(5, checkOutDate);
-            stmt.setString(6, status);
-            stmt.setDouble(7, totalAmount);
+            pstmt.setString(1, reservationId);
+            pstmt.setString(2, userId);
+            pstmt.setString(3, reservationDate);
+            pstmt.setString(4, checkInDate);
+            pstmt.setString(5, checkOutDate);
+            pstmt.setString(6, status);
+            pstmt.setDouble(7, totalAmount);
 
-            stmt.executeUpdate();
-            return true;
+            pstmt.executeUpdate();
+            System.out.println("Reservation added successfully.");
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
     }
 
     // READ
-    public List<String[]> getAllReservations() {
+    public void getAllReservations() {
 
-        List<String[]> reservations = new ArrayList<>();
-
-        String sql = "SELECT reservation_id, user_id, reservation_date, "
-                + "check_in_date, check_out_date, status, total_amount "
-                + "FROM reservations";
+        String sql = "SELECT * FROM reservations";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                reservations.add(new String[]{
-                    rs.getString("reservation_id"),
-                    rs.getString("user_id"),
-                    rs.getString("reservation_date"),
-                    rs.getString("check_in_date"),
-                    rs.getString("check_out_date"),
-                    rs.getString("status"),
-                    String.valueOf(rs.getDouble("total_amount"))
-                });
+                System.out.println(
+                        rs.getString("reservation_id") + " | " +
+                        rs.getString("user_id") + " | " +
+                        rs.getString("reservation_date") + " | " +
+                        rs.getString("check_in_date") + " | " +
+                        rs.getString("check_out_date") + " | " +
+                        rs.getString("status") + " | " +
+                        rs.getDouble("total_amount")
+                );
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return reservations;
     }
 
     // UPDATE
-    public boolean updateReservation(String reservationId, String userId,
-                                     String reservationDate, String checkInDate,
-                                     String checkOutDate, String status,
-                                     double totalAmount) {
+    public void updateReservation(String reservationId, String userId,
+                                   String reservationDate, String checkInDate,
+                                   String checkOutDate, String status,
+                                   double totalAmount) {
 
-        String sql = "UPDATE reservations SET user_id = ?, "
-                + "reservation_date = ?, check_in_date = ?, "
-                + "check_out_date = ?, status = ?, total_amount = ? "
-                + "WHERE reservation_id = ?";
+        String sql = "UPDATE reservations SET " +
+                "user_id = ?, reservation_date = ?, check_in_date = ?, " +
+                "check_out_date = ?, status = ?, total_amount = ? " +
+                "WHERE reservation_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, userId);
-            stmt.setString(2, reservationDate);
-            stmt.setString(3, checkInDate);
-            stmt.setString(4, checkOutDate);
-            stmt.setString(5, status);
-            stmt.setDouble(6, totalAmount);
-            stmt.setString(7, reservationId);
+            pstmt.setString(1, userId);
+            pstmt.setString(2, reservationDate);
+            pstmt.setString(3, checkInDate);
+            pstmt.setString(4, checkOutDate);
+            pstmt.setString(5, status);
+            pstmt.setDouble(6, totalAmount);
+            pstmt.setString(7, reservationId);
 
-            stmt.executeUpdate();
-            return true;
+            pstmt.executeUpdate();
+            System.out.println("Reservation updated successfully.");
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
     }
 
@@ -109,14 +100,15 @@ public class ReservationDAO {
         String sql = "DELETE FROM reservations WHERE reservation_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, reservationId);
+            pstmt.setString(1, reservationId);
 
-            stmt.executeUpdate();
-            return true;
+            int rowsAffected = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }

@@ -21,8 +21,8 @@ public class UserDAO {
             stmt.setString(3, email);
             stmt.setString(4, phone);
 
-            stmt.executeUpdate();
-            return true;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,8 +68,8 @@ public class UserDAO {
             stmt.setString(3, phone);
             stmt.setString(4, userId);
 
-            stmt.executeUpdate();
-            return true;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,8 +86,8 @@ public class UserDAO {
 
             stmt.setString(1, userId);
 
-            stmt.executeUpdate();
-            return true;
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (Exception e) {
             e.printStackTrace();

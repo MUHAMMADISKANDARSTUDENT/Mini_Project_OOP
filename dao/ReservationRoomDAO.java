@@ -4,77 +4,73 @@ import database.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 
 public class ReservationRoomDAO {
 
-    // CREATE - link a room to a reservation
-    public boolean addReservationRoom(String reservationId, String roomId) {
+    // CREATE - Add a room to a reservation
+    public void addReservationRoom(String reservationId, String roomId) {
 
-        String sql = "INSERT INTO reservation_rooms "
-                + "(reservation_id, room_id) VALUES (?, ?)";
+        String sql = "INSERT INTO reservation_rooms " +
+                     "(reservation_id, room_id) VALUES (?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, reservationId);
-            stmt.setString(2, roomId);
+            pstmt.setString(1, reservationId);
+            pstmt.setString(2, roomId);
 
-            stmt.executeUpdate();
-            return true;
+            pstmt.executeUpdate();
+            System.out.println("Reservation-room added successfully.");
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
     }
 
-    // READ - get rooms linked to a reservation
-    public List<String[]> getRoomsByReservation(String reservationId) {
+    // READ - Get rooms belonging to a reservation
+    public void getRoomsByReservation(String reservationId) {
 
-        List<String[]> rooms = new ArrayList<>();
-
-        String sql = "SELECT reservation_id, room_id "
-                + "FROM reservation_rooms WHERE reservation_id = ?";
+        String sql = "SELECT room_id FROM reservation_rooms " +
+                     "WHERE reservation_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, reservationId);
+            pstmt.setString(1, reservationId);
 
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+
                 while (rs.next()) {
-                    rooms.add(new String[]{
-                        rs.getString("reservation_id"),
-                        rs.getString("room_id")
-                    });
+                    System.out.println(
+                            "Reservation: " + reservationId +
+                            " | Room: " + rs.getString("room_id")
+                    );
                 }
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return rooms;
     }
 
-    // DELETE - remove a room from a reservation
+    // DELETE - Remove a room from a reservation
     public boolean deleteReservationRoom(String reservationId, String roomId) {
 
-        String sql = "DELETE FROM reservation_rooms "
-                + "WHERE reservation_id = ? AND room_id = ?";
+        String sql = "DELETE FROM reservation_rooms " +
+                     "WHERE reservation_id = ? AND room_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, reservationId);
-            stmt.setString(2, roomId);
+            pstmt.setString(1, reservationId);
+            pstmt.setString(2, roomId);
 
-            stmt.executeUpdate();
-            return true;
+            int rowsAffected = pstmt.executeUpdate();
 
-        } catch (Exception e) {
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
