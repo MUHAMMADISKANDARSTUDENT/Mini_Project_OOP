@@ -11,68 +11,60 @@ import java.util.ArrayList;
 public class Reservation {
 
     private String reservationId;
-    private LocalDate reservationDate;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
+    private String userId;
+    private String roomId;
+    private String reservationDate;
+    private String checkInDate;
+    private String checkOutDate;
     private String status;
     private double totalAmount;
-    private ArrayList<HotelRoom> rooms;
 
-    public Reservation(String reservationId, LocalDate reservationDate,
-                       LocalDate checkInDate, LocalDate checkOutDate) {
+    public Reservation(
+            String reservationId,
+            String userId,
+            String roomId,
+            String reservationDate,
+            String checkInDate,
+            String checkOutDate,
+            String status,
+            double totalAmount) {
+
         this.reservationId = reservationId;
+        this.userId = userId;
+        this.roomId = roomId;
         this.reservationDate = reservationDate;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
-        this.status = "Pending";
-        this.totalAmount = 0.0;
-        this.rooms = new ArrayList<>();
+        this.status = status;
+        this.totalAmount = totalAmount;
     }
 
-    public void addRoom(HotelRoom room) {
-        rooms.add(room);
+    public String getReservationId() {
+        return reservationId;
     }
 
-    public void removeRoom(HotelRoom room) {
-        rooms.remove(room);
+    public String getUserId() {
+        return userId;
     }
 
-    public void createReservation() {
-        status = "Confirmed";
-        calculateTotal();
+    public String getRoomId() {
+        return roomId;
     }
 
-    public void cancelReservation() {
-        status = "Cancelled";
+    public String getReservationDate() {
+        return reservationDate;
     }
 
-    public double calculateTotal() {
-
-        long nights = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
-
-        totalAmount = 0.0;
-
-        for (HotelRoom room : rooms) {
-            totalAmount += room.calculatePrice() * nights;
-        }
-
-        return totalAmount;
+    public String getCheckInDate() {
+        return checkInDate;
     }
 
-    public String getDetails() {
-        return "Reservation ID: " + reservationId
-                + ", Check-in: " + checkInDate
-                + ", Check-out: " + checkOutDate
-                + ", Status: " + status
-                + ", Total: RM" + totalAmount;
+    public String getCheckOutDate() {
+        return checkOutDate;
     }
 
     public String getStatus() {
         return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public double getTotalAmount() {
