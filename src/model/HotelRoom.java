@@ -21,7 +21,12 @@ public class HotelRoom {
     }
 
     public String getDetails() {
-        return "Room " + roomNumber + " - RM" + basePrice;
+        return "Room " + roomNumber
+                + " - RM" + String.format("%.2f", basePrice);
+    }
+
+    public String getRoomId() {
+        return roomId;
     }
 
     public String getRoomNumber() {
@@ -30,5 +35,25 @@ public class HotelRoom {
 
     public double getBasePrice() {
         return basePrice;
+    }
+
+    public static double getBasePriceByBedType(String bedType) {
+
+        switch (bedType) {
+            case "Single":
+                return 100.00;
+
+            case "Double":
+                return 120.00;
+
+            case "Queen":
+                return 140.00;
+
+            case "King":
+                return 160.00;
+
+            default:
+                return 100.00;
+        }
     }
 }

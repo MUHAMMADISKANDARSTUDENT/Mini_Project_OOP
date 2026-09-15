@@ -9,49 +9,46 @@ import java.time.LocalDate;
 public class Payment {
 
     private String paymentId;
-    private LocalDate paymentDate;
+    private String reservationId;
+    private String paymentDate;
     private double amount;
     private String method;
     private String status;
 
-    public Payment(String paymentId, LocalDate paymentDate,
-                   double amount, String method) {
+    public Payment(
+            String paymentId,
+            String reservationId,
+            String paymentDate,
+            double amount,
+            String method,
+            String status) {
+
         this.paymentId = paymentId;
+        this.reservationId = reservationId;
         this.paymentDate = paymentDate;
         this.amount = amount;
         this.method = method;
-        this.status = "Pending";
+        this.status = status;
     }
 
-    public boolean processPayment() {
-        if (amount > 0) {
-            status = "Paid";
-            return true;
-        }
-
-        status = "Failed";
-        return false;
+    public String getPaymentId() {
+        return paymentId;
     }
 
-    public boolean refund() {
-        if (status.equals("Paid")) {
-            status = "Refunded";
-            return true;
-        }
-
-        return false;
+    public String getReservationId() {
+        return reservationId;
     }
 
-    public String getDetails() {
-        return "Payment ID: " + paymentId
-                + ", Date: " + paymentDate
-                + ", Amount: RM" + amount
-                + ", Method: " + method
-                + ", Status: " + status;
+    public String getPaymentDate() {
+        return paymentDate;
     }
 
     public double getAmount() {
         return amount;
+    }
+
+    public String getMethod() {
+        return method;
     }
 
     public String getStatus() {

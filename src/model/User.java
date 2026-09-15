@@ -18,6 +18,10 @@ public class User {
         this.phone = phone;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public String getDetails() {
         return userId + " - " + name + " - " + email + " - " + phone;
     }
