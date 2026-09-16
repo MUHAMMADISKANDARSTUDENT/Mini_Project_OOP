@@ -1,10 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 
 public class MainGUI extends JFrame {
 
     private JTextField usernameField;
     private JPasswordField passwordField;
+
+    // Store usernames and passwords
+    private HashMap<String, String> accounts;
 
     public MainGUI() {
         setTitle("Hotel Reservation System - Login");
@@ -13,9 +17,17 @@ public class MainGUI extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
+        // Create login accounts
+        accounts = new HashMap<>();
+        accounts.put("admin", "1234");
+        accounts.put("staff1", "1111");
+        accounts.put("staff2", "2222");
+        accounts.put("manager", "3333");
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
 
+        // Header
         JLabel titleLabel = new JLabel("HOTEL RESERVATION SYSTEM", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
 
@@ -28,6 +40,7 @@ public class MainGUI extends JFrame {
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
+        // Login Panel
         JPanel loginPanel = new JPanel(new GridBagLayout());
         loginPanel.setBorder(BorderFactory.createTitledBorder("Authentication"));
 
@@ -35,6 +48,7 @@ public class MainGUI extends JFrame {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Username
         gbc.gridx = 0;
         gbc.gridy = 0;
         loginPanel.add(new JLabel("Username:"), gbc);
@@ -43,6 +57,7 @@ public class MainGUI extends JFrame {
         gbc.gridx = 1;
         loginPanel.add(usernameField, gbc);
 
+        // Password
         gbc.gridx = 0;
         gbc.gridy = 1;
         loginPanel.add(new JLabel("Password:"), gbc);
@@ -51,6 +66,7 @@ public class MainGUI extends JFrame {
         gbc.gridx = 1;
         loginPanel.add(passwordField, gbc);
 
+        // Buttons
         JButton loginButton = new JButton("Login");
         JButton exitButton = new JButton("Exit");
 
@@ -65,6 +81,7 @@ public class MainGUI extends JFrame {
 
         mainPanel.add(loginPanel, BorderLayout.CENTER);
 
+        // Button Listeners
         loginButton.addActionListener(e -> login());
         exitButton.addActionListener(e -> System.exit(0));
 
@@ -75,7 +92,10 @@ public class MainGUI extends JFrame {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
 
-        if (username.equals("admin") && password.equals("1234")) {
+        // Check whether username exists and password matches
+        if (accounts.containsKey(username) &&
+            accounts.get(username).equals(password)) {
+
             JOptionPane.showMessageDialog(
                 this,
                 "Login successful!",

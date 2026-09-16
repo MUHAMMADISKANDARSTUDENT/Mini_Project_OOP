@@ -1,6 +1,10 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class CustomerGUI extends JFrame {
 
@@ -9,7 +13,8 @@ public class CustomerGUI extends JFrame {
     private DefaultTableModel tableModel;
 
     public CustomerGUI() {
-        setTitle("Hotel Reservation System - User Management");
+
+        setTitle("Hotel Reservation System - Customer Management");
         setSize(850, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -17,60 +22,128 @@ public class CustomerGUI extends JFrame {
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
         );
+
+        // =========================
+        // TITLE
+        // =========================
 
         JLabel titleLabel = new JLabel(
-            "USER MANAGEMENT (UML: User)",
-            SwingConstants.CENTER
+                "CUSTOMER MANAGEMENT",
+                SwingConstants.CENTER
         );
 
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setFont(
+                new Font("Arial", Font.BOLD, 20)
+        );
 
-        JPanel formPanel = new JPanel(new GridBagLayout());
+        // =========================
+        // FORM PANEL
+        // =========================
+
+        JPanel formPanel = new JPanel(
+                new GridBagLayout()
+        );
+
         formPanel.setBorder(
-            BorderFactory.createTitledBorder("User Information")
+                BorderFactory.createTitledBorder(
+                        "Customer Information"
+                )
         );
 
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // =========================
+        // USER ID
+        // =========================
+
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("User ID (userId):"), gbc);
+
+        formPanel.add(
+                new JLabel("User ID (userId):"),
+                gbc
+        );
 
         userIdField = new JTextField(15);
 
         gbc.gridx = 1;
-        formPanel.add(userIdField, gbc);
+
+        formPanel.add(
+                userIdField,
+                gbc
+        );
+
+        // =========================
+        // FULL NAME
+        // =========================
 
         gbc.gridx = 2;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Full Name (name):"), gbc);
+
+        formPanel.add(
+                new JLabel("Full Name (name):"),
+                gbc
+        );
 
         nameField = new JTextField(15);
 
         gbc.gridx = 3;
-        formPanel.add(nameField, gbc);
+
+        formPanel.add(
+                nameField,
+                gbc
+        );
+
+        // =========================
+        // EMAIL
+        // =========================
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        formPanel.add(new JLabel("Email Address (email):"), gbc);
+
+        formPanel.add(
+                new JLabel("Email Address (email):"),
+                gbc
+        );
 
         emailField = new JTextField(15);
 
         gbc.gridx = 1;
-        formPanel.add(emailField, gbc);
+
+        formPanel.add(
+                emailField,
+                gbc
+        );
+
+        // =========================
+        // PHONE
+        // =========================
 
         gbc.gridx = 2;
         gbc.gridy = 1;
-        formPanel.add(new JLabel("Phone (phone):"), gbc);
+
+        formPanel.add(
+                new JLabel("Phone (phone):"),
+                gbc
+        );
 
         phoneField = new JTextField(15);
 
         gbc.gridx = 3;
-        formPanel.add(phoneField, gbc);
+
+        formPanel.add(
+                phoneField,
+                gbc
+        );
+
+        // =========================
+        // BUTTONS
+        // =========================
 
         JPanel buttonPanel = new JPanel();
 
@@ -88,14 +161,37 @@ public class CustomerGUI extends JFrame {
         gbc.gridy = 2;
         gbc.gridwidth = 4;
 
-        formPanel.add(buttonPanel, gbc);
+        formPanel.add(
+                buttonPanel,
+                gbc
+        );
 
-        JPanel topPanel = new JPanel(new BorderLayout(10, 10));
+        // =========================
+        // TOP PANEL
+        // =========================
 
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-        topPanel.add(formPanel, BorderLayout.CENTER);
+        JPanel topPanel = new JPanel(
+                new BorderLayout(10, 10)
+        );
 
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+        topPanel.add(
+                titleLabel,
+                BorderLayout.NORTH
+        );
+
+        topPanel.add(
+                formPanel,
+                BorderLayout.CENTER
+        );
+
+        mainPanel.add(
+                topPanel,
+                BorderLayout.NORTH
+        );
+
+        // =========================
+        // TABLE
+        // =========================
 
         String[] columns = {
             "userId",
@@ -104,153 +200,691 @@ public class CustomerGUI extends JFrame {
             "phone"
         };
 
-        tableModel = new DefaultTableModel(columns, 0) {
+        tableModel = new DefaultTableModel(
+                columns,
+                0
+        ) {
+
             @Override
-            public boolean isCellEditable(int r, int c) {
+            public boolean isCellEditable(
+                    int row,
+                    int column) {
+
                 return false;
             }
         };
 
         userTable = new JTable(tableModel);
+
         userTable.setRowHeight(25);
+
         userTable.setSelectionMode(
-            ListSelectionModel.SINGLE_SELECTION
+                ListSelectionModel.SINGLE_SELECTION
         );
 
-        JScrollPane scrollPane = new JScrollPane(userTable);
+        JScrollPane scrollPane = new JScrollPane(
+                userTable
+        );
 
         scrollPane.setBorder(
-            BorderFactory.createTitledBorder("User Records")
+                BorderFactory.createTitledBorder(
+                        "Customer Records"
+                )
         );
 
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(
+                scrollPane,
+                BorderLayout.CENTER
+        );
+
+        // =========================
+        // FOOTER
+        // =========================
 
         JPanel bottomPanel = new JPanel(
-            new FlowLayout(FlowLayout.RIGHT)
+                new FlowLayout(
+                        FlowLayout.RIGHT
+                )
         );
 
-        JButton backButton = new JButton("Back to Dashboard");
+        JButton backButton = new JButton(
+                "Back to Dashboard"
+        );
 
-        bottomPanel.add(backButton);
+        bottomPanel.add(
+                backButton
+        );
 
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+        mainPanel.add(
+                bottomPanel,
+                BorderLayout.SOUTH
+        );
 
-        addButton.addActionListener(e -> addRow());
-        updateButton.addActionListener(e -> updateRow());
-        deleteButton.addActionListener(e -> deleteRow());
-        clearButton.addActionListener(e -> clearForm());
+        // =========================
+        // BUTTON LISTENERS
+        // =========================
+
+        addButton.addActionListener(
+                e -> addRow()
+        );
+
+        updateButton.addActionListener(
+                e -> updateRow()
+        );
+
+        deleteButton.addActionListener(
+                e -> deleteRow()
+        );
+
+        clearButton.addActionListener(
+                e -> clearForm()
+        );
 
         backButton.addActionListener(e -> {
+
             new DashboardGUI().setVisible(true);
+
             dispose();
         });
 
-        userTable.getSelectionModel().addListSelectionListener(e -> {
+        // =========================
+        // TABLE SELECTION
+        // =========================
+
+        userTable.getSelectionModel()
+                .addListSelectionListener(e -> {
 
             if (!e.getValueIsAdjusting()
                     && userTable.getSelectedRow() >= 0) {
 
-                int r = userTable.getSelectedRow();
+                int r =
+                        userTable.getSelectedRow();
 
                 userIdField.setText(
-                    tableModel.getValueAt(r, 0).toString()
+                        tableModel
+                                .getValueAt(r, 0)
+                                .toString()
                 );
 
                 nameField.setText(
-                    tableModel.getValueAt(r, 1).toString()
+                        tableModel
+                                .getValueAt(r, 1)
+                                .toString()
                 );
 
                 emailField.setText(
-                    tableModel.getValueAt(r, 2).toString()
+                        tableModel
+                                .getValueAt(r, 2)
+                                .toString()
                 );
 
                 phoneField.setText(
-                    tableModel.getValueAt(r, 3).toString()
+                        tableModel
+                                .getValueAt(r, 3)
+                                .toString()
                 );
             }
         });
 
         add(mainPanel);
+
+        // =========================
+        // LOAD DATABASE RECORDS
+        // =========================
+
+        loadCustomers();
     }
+
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    private boolean validateInput() {
+
+        String userId =
+                userIdField.getText().trim();
+
+        String name =
+                nameField.getText().trim();
+
+        String email =
+                emailField.getText().trim();
+
+        String phone =
+                phoneField.getText().trim();
+
+        // -------------------------
+        // USER ID
+        // -------------------------
+
+        if (userId.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter User ID.",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            userIdField.requestFocus();
+
+            return false;
+        }
+
+        // -------------------------
+        // NAME
+        // -------------------------
+
+        if (name.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter Full Name.",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            nameField.requestFocus();
+
+            return false;
+        }
+
+        // -------------------------
+        // EMAIL
+        // -------------------------
+
+        if (email.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter Email Address.",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            emailField.requestFocus();
+
+            return false;
+        }
+
+        // Email format
+
+        if (!email.matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter a valid email address.\n"
+                    + "Example: customer@gmail.com",
+                    "Invalid Email",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            emailField.requestFocus();
+
+            return false;
+        }
+
+        // -------------------------
+        // PHONE
+        // -------------------------
+
+        if (phone.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter Phone Number.",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            phoneField.requestFocus();
+
+            return false;
+        }
+
+        // Phone format
+
+        if (!phone.matches("\\d{10,11}")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Phone number must contain 10 or 11 digits.",
+                    "Invalid Phone",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            phoneField.requestFocus();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // =====================================================
+    // LOAD CUSTOMERS
+    // =====================================================
+
+    private void loadCustomers() {
+
+        String sql =
+                "SELECT user_id, name, email, phone "
+                + "FROM users";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql);
+
+                ResultSet rs =
+                        pstmt.executeQuery()
+        ) {
+
+            tableModel.setRowCount(0);
+
+            while (rs.next()) {
+
+                tableModel.addRow(
+                        new Object[]{
+                            rs.getString("user_id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("phone")
+                        }
+                );
+            }
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error loading customers:\n"
+                    + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =====================================================
+    // CREATE / SAVE
+    // =====================================================
 
     private void addRow() {
 
-        if (userIdField.getText().trim().isEmpty()
-                || nameField.getText().trim().isEmpty()) {
+        // Validate input
+
+        if (!validateInput()) {
+            return;
+        }
+
+        String userId =
+                userIdField.getText().trim();
+
+        String name =
+                nameField.getText().trim();
+
+        String email =
+                emailField.getText().trim();
+
+        String phone =
+                phoneField.getText().trim();
+
+        // Check duplicate User ID in database
+
+        String checkSql =
+                "SELECT user_id FROM users "
+                + "WHERE user_id = ?";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement checkStmt =
+                        conn.prepareStatement(checkSql)
+        ) {
+
+            checkStmt.setString(
+                    1,
+                    userId
+            );
+
+            ResultSet rs =
+                    checkStmt.executeQuery();
+
+            if (rs.next()) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "User ID already exists.",
+                        "Duplicate User ID",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                userIdField.requestFocus();
+
+                return;
+            }
+
+        } catch (SQLException ex) {
 
             JOptionPane.showMessageDialog(
-                this,
-                "Please fill in all required fields.",
-                "Input Warning",
-                JOptionPane.WARNING_MESSAGE
+                    this,
+                    "Error checking User ID:\n"
+                    + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
             );
 
             return;
         }
 
-        tableModel.addRow(new Object[] {
-            userIdField.getText().trim(),
-            nameField.getText().trim(),
-            emailField.getText().trim(),
-            phoneField.getText().trim()
-        });
+        // INSERT
 
-        clearForm();
-    }
+        String sql =
+                "INSERT INTO users "
+                + "(user_id, name, email, phone) "
+                + "VALUES (?, ?, ?, ?)";
 
-    private void updateRow() {
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
 
-        int r = userTable.getSelectedRow();
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
 
-        if (r >= 0) {
+            pstmt.setString(1, userId);
+            pstmt.setString(2, name);
+            pstmt.setString(3, email);
+            pstmt.setString(4, phone);
 
-            tableModel.setValueAt(
-                userIdField.getText().trim(), r, 0
-            );
+            pstmt.executeUpdate();
 
-            tableModel.setValueAt(
-                nameField.getText().trim(), r, 1
-            );
+            // Refresh table from database
 
-            tableModel.setValueAt(
-                emailField.getText().trim(), r, 2
-            );
+            loadCustomers();
 
-            tableModel.setValueAt(
-                phoneField.getText().trim(), r, 3
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Customer added successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
             );
 
             clearForm();
 
-        } else {
+        } catch (SQLException ex) {
 
             JOptionPane.showMessageDialog(
-                this,
-                "Please select a row to update.",
-                "Selection Required",
-                JOptionPane.INFORMATION_MESSAGE
+                    this,
+                    "Error saving customer:\n"
+                    + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
             );
         }
     }
 
-    private void deleteRow() {
+    // =====================================================
+    // UPDATE
+    // =====================================================
 
-        int r = userTable.getSelectedRow();
+    private void updateRow() {
 
-        if (r >= 0) {
+        int r =
+                userTable.getSelectedRow();
 
-            if (JOptionPane.showConfirmDialog(
+        if (r < 0) {
+
+            JOptionPane.showMessageDialog(
                     this,
-                    "Are you sure you want to delete this record?",
-                    "Delete Confirmation",
-                    JOptionPane.YES_NO_OPTION
-                ) == JOptionPane.YES_OPTION) {
+                    "Please select a customer to update.",
+                    "Selection Required",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
 
-                tableModel.removeRow(r);
-                clearForm();
+            return;
+        }
+
+        // Validate input
+
+        if (!validateInput()) {
+            return;
+        }
+
+        // Get original User ID from selected row
+
+        String oldUserId =
+                tableModel
+                        .getValueAt(r, 0)
+                        .toString();
+
+        String userId =
+                userIdField.getText().trim();
+
+        String name =
+                nameField.getText().trim();
+
+        String email =
+                emailField.getText().trim();
+
+        String phone =
+                phoneField.getText().trim();
+
+        // Check if new User ID belongs to another customer
+
+        if (!oldUserId.equalsIgnoreCase(userId)) {
+
+            String checkSql =
+                    "SELECT user_id FROM users "
+                    + "WHERE user_id = ?";
+
+            try (
+                    Connection conn =
+                            DBConnection.getConnection();
+
+                    PreparedStatement checkStmt =
+                            conn.prepareStatement(checkSql)
+            ) {
+
+                checkStmt.setString(
+                        1,
+                        userId
+                );
+
+                ResultSet rs =
+                        checkStmt.executeQuery();
+
+                if (rs.next()) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Another customer already uses this User ID.",
+                            "Duplicate User ID",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                    return;
+                }
+
+            } catch (SQLException ex) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Error checking User ID:\n"
+                        + ex.getMessage(),
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
             }
         }
+
+        // UPDATE DATABASE
+
+        String sql =
+                "UPDATE users SET "
+                + "user_id = ?, "
+                + "name = ?, "
+                + "email = ?, "
+                + "phone = ? "
+                + "WHERE user_id = ?";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setString(1, userId);
+            pstmt.setString(2, name);
+            pstmt.setString(3, email);
+            pstmt.setString(4, phone);
+            pstmt.setString(5, oldUserId);
+
+            int rowsUpdated =
+                    pstmt.executeUpdate();
+
+            if (rowsUpdated > 0) {
+
+                loadCustomers();
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Customer updated successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                clearForm();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Customer was not found in the database.",
+                        "Update Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error updating customer:\n"
+                    + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
+
+    // =====================================================
+    // DELETE
+    // =====================================================
+
+    private void deleteRow() {
+
+        int r =
+                userTable.getSelectedRow();
+
+        if (r < 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a customer to delete.",
+                    "Selection Required",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            return;
+        }
+
+        String userId =
+                tableModel
+                        .getValueAt(r, 0)
+                        .toString();
+
+        int result =
+                JOptionPane.showConfirmDialog(
+                        this,
+                        "Are you sure you want to delete this customer?",
+                        "Delete Confirmation",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+        if (result != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        // DELETE FROM DATABASE
+
+        String sql =
+                "DELETE FROM users "
+                + "WHERE user_id = ?";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setString(
+                    1,
+                    userId
+            );
+
+            int rowsDeleted =
+                    pstmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+
+                loadCustomers();
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Customer deleted successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                clearForm();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Customer was not found in the database.",
+                        "Delete Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
+
+        } catch (SQLException ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error deleting customer:\n"
+                    + ex.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    // =====================================================
+    // CLEAR
+    // =====================================================
 
     private void clearForm() {
 
@@ -260,11 +894,18 @@ public class CustomerGUI extends JFrame {
         phoneField.setText("");
 
         userTable.clearSelection();
+
+        userIdField.requestFocus();
     }
 
+    // =====================================================
+    // MAIN
+    // =====================================================
+
     public static void main(String[] args) {
+
         SwingUtilities.invokeLater(
-            () -> new CustomerGUI().setVisible(true)
+                () -> new CustomerGUI().setVisible(true)
         );
     }
 }
