@@ -10,7 +10,11 @@ public class HotelRoom {
     protected String roomNumber;
     protected double basePrice;
 
-    public HotelRoom(String roomId, String roomNumber, double basePrice) {
+    public HotelRoom(
+            String roomId,
+            String roomNumber,
+            double basePrice) {
+
         this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.basePrice = basePrice;
@@ -22,7 +26,8 @@ public class HotelRoom {
 
     public String getDetails() {
         return "Room " + roomNumber
-                + " - RM" + String.format("%.2f", basePrice);
+                + " - RM"
+                + String.format("%.2f", basePrice);
     }
 
     public String getRoomId() {
@@ -37,6 +42,19 @@ public class HotelRoom {
         return basePrice;
     }
 
+    // Default values for generic HotelRoom
+    public String getBedType() {
+        return "";
+    }
+
+    public int getMaxOccupancy() {
+        return 0;
+    }
+
+    public double getExtraCharge() {
+        return 0.00;
+    }
+
     public static double getBasePriceByBedType(String bedType) {
 
         switch (bedType) {
@@ -44,13 +62,13 @@ public class HotelRoom {
                 return 100.00;
 
             case "Double":
-                return 120.00;
+                return 150.00;
 
             case "Queen":
-                return 140.00;
+                return 180.00;
 
             case "King":
-                return 160.00;
+                return 220.00;
 
             default:
                 return 100.00;

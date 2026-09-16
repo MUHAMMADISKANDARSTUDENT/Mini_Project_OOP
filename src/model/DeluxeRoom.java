@@ -8,37 +8,51 @@ public class DeluxeRoom extends HotelRoom {
 
     private String bedType;
     private int maxOccupancy;
-    private double extraCharge;
 
     private static final double EXTRA_CHARGE = 80.00;
 
-    public DeluxeRoom(String roomId, String roomNumber,
-                      double basePrice,
-                      String bedType,
-                      int maxOccupancy) {
+    public DeluxeRoom(
+            String roomId,
+            String roomNumber,
+            double basePrice,
+            String bedType,
+            int maxOccupancy) {
 
         super(roomId, roomNumber, basePrice);
 
         this.bedType = bedType;
         this.maxOccupancy = maxOccupancy;
-        this.extraCharge = EXTRA_CHARGE;
     }
 
     @Override
     public double calculatePrice() {
-        return basePrice + extraCharge;
+        return basePrice + EXTRA_CHARGE;
     }
 
     @Override
     public String getDetails() {
-        return "Deluxe Room - " + roomNumber
-                + ", Bed Type: " + bedType
-                + ", Max Occupancy: " + maxOccupancy
+        return "Deluxe Room - "
+                + roomNumber
+                + ", Bed Type: "
+                + bedType
+                + ", Max Occupancy: "
+                + maxOccupancy
                 + ", Extra Charge: RM"
-                + String.format("%.2f", extraCharge);
+                + String.format("%.2f", EXTRA_CHARGE);
     }
 
+    @Override
+    public String getBedType() {
+        return bedType;
+    }
+
+    @Override
+    public int getMaxOccupancy() {
+        return maxOccupancy;
+    }
+
+    @Override
     public double getExtraCharge() {
-        return extraCharge;
+        return EXTRA_CHARGE;
     }
 }
