@@ -1,177 +1,220 @@
-package dao;
-
-import database.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaymentDAO {
+public class ReservationDAO {
 
+    
     // CREATE
-    public boolean addPayment(
-            String paymentId,
-            String reservationId,
-            String paymentDate,
-            double amount,
-            String method,
-            String status) {
+    
+
+    public boolean addReservation(Reservation reservation) {
 
         String sql = """
-            INSERT INTO payments
-            (payment_id, reservation_id, payment_date,
-             amount, method, status)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO reservations
+            (
+                reservation_id,
+                user_id,
+                room_id,
+                reservation_date,
+                check_in_date,
+                check_out_date,
+                status,
+                total_amount
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
 
-            stmt.setString(1, paymentId);
-            stmt.setString(2, reservationId);
-            stmt.setString(3, paymentDate);
-            stmt.setDouble(4, amount);
-            stmt.setString(5, method);
-            stmt.setString(6, status);
+            stmt.setString(1, reservation.getReservationId());
+            stmt.setString(2, reservation.getUserId());
+            stmt.setString(3, reservation.getRoomId());
+            stmt.setString(4, reservation.getReservationDate());
+            stmt.setString(5, reservation.getCheckInDate());
+            stmt.setString(6, reservation.getCheckOutDate());
+            stmt.setString(7, reservation.getStatus());
+            stmt.setDouble(8, reservation.getTotalAmount());
 
             return stmt.executeUpdate() > 0;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
             return false;
         }
     }
 
+    
     // READ ALL
-    public List<String[]> getAllPayments() {
+    
 
-        List<String[]> payments = new ArrayList<>();
+    public List<Reservation> getAllReservations() {
+
+        List<Reservation> reservations = new ArrayList<>();
 
         String sql = """
-            SELECT payment_id, reservation_id, payment_date,
-                   amount, method, status
-            FROM payments
-            ORDER BY payment_id
+            SELECT
+                reservation_id,
+                user_id,
+                room_id,
+                reservation_date,
+                check_in_date,
+                check_out_date,
+                status,
+                total_amount
+            FROM reservations
+            ORDER BY reservation_id
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()
+        ) {
 
             while (rs.next()) {
 
-                String[] payment = {
-                    rs.getString("payment_id"),
+                Reservation reservation = new Reservation(
                     rs.getString("reservation_id"),
-                    rs.getString("payment_date"),
-                    String.valueOf(rs.getDouble("amount")),
-                    rs.getString("method"),
-                    rs.getString("status")
-                };
+                    rs.getString("user_id"),
+                    rs.getString("room_id"),
+                    rs.getString("reservation_date"),
+                    rs.getString("check_in_date"),
+                    rs.getString("check_out_date"),
+                    rs.getString("status"),
+                    rs.getDouble("total_amount")
+                );
 
-                payments.add(payment);
+                reservations.add(reservation);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
 
-        return payments;
+        return reservations;
     }
 
+    
     // READ ONE
-    public String[] getPaymentById(String paymentId) {
+    
+
+    public Reservation getReservationById(String reservationId) {
 
         String sql = """
-            SELECT payment_id, reservation_id, payment_date,
-                   amount, method, status
-            FROM payments
-            WHERE payment_id = ?
+            SELECT
+                reservation_id,
+                user_id,
+                room_id,
+                reservation_date,
+                check_in_date,
+                check_out_date,
+                status,
+                total_amount
+            FROM reservations
+            WHERE reservation_id = ?
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
 
-            stmt.setString(1, paymentId);
+            stmt.setString(1, reservationId);
 
             try (ResultSet rs = stmt.executeQuery()) {
 
                 if (rs.next()) {
 
-                    return new String[]{
-                        rs.getString("payment_id"),
+                    return new Reservation(
                         rs.getString("reservation_id"),
-                        rs.getString("payment_date"),
-                        String.valueOf(rs.getDouble("amount")),
-                        rs.getString("method"),
-                        rs.getString("status")
-                    };
+                        rs.getString("user_id"),
+                        rs.getString("room_id"),
+                        rs.getString("reservation_date"),
+                        rs.getString("check_in_date"),
+                        rs.getString("check_out_date"),
+                        rs.getString("status"),
+                        rs.getDouble("total_amount")
+                    );
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
 
         return null;
     }
 
+    
     // UPDATE
-    public boolean updatePayment(
-            String paymentId,
-            String reservationId,
-            String paymentDate,
-            double amount,
-            String method,
-            String status) {
+    
+
+    public boolean updateReservation(Reservation reservation) {
 
         String sql = """
-            UPDATE payments
-            SET reservation_id = ?,
-                payment_date = ?,
-                amount = ?,
-                method = ?,
-                status = ?
-            WHERE payment_id = ?
+            UPDATE reservations
+            SET
+                user_id = ?,
+                room_id = ?,
+                reservation_date = ?,
+                check_in_date = ?,
+                check_out_date = ?,
+                status = ?,
+                total_amount = ?
+            WHERE reservation_id = ?
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
 
-            stmt.setString(1, reservationId);
-            stmt.setString(2, paymentDate);
-            stmt.setDouble(3, amount);
-            stmt.setString(4, method);
-            stmt.setString(5, status);
-            stmt.setString(6, paymentId);
+            stmt.setString(1, reservation.getUserId());
+            stmt.setString(2, reservation.getRoomId());
+            stmt.setString(3, reservation.getReservationDate());
+            stmt.setString(4, reservation.getCheckInDate());
+            stmt.setString(5, reservation.getCheckOutDate());
+            stmt.setString(6, reservation.getStatus());
+            stmt.setDouble(7, reservation.getTotalAmount());
+            stmt.setString(8, reservation.getReservationId());
 
             return stmt.executeUpdate() > 0;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
             return false;
         }
     }
 
+    
     // DELETE
-    public boolean deletePayment(String paymentId) {
+    
+
+    public boolean deleteReservation(String reservationId) {
 
         String sql = """
-            DELETE FROM payments
-            WHERE payment_id = ?
+            DELETE FROM reservations
+            WHERE reservation_id = ?
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
 
-            stmt.setString(1, paymentId);
+            stmt.setString(1, reservationId);
 
             return stmt.executeUpdate() > 0;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
             return false;
         }
     }

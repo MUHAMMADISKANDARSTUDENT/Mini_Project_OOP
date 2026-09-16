@@ -1,7 +1,3 @@
-package dao;
-
-import database.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,11 +7,7 @@ import java.util.List;
 public class UserDAO {
 
     // CREATE
-    public boolean addUser(
-            String userId,
-            String name,
-            String email,
-            String phone) {
+    public boolean addUser(User user) {
 
         String sql = """
             INSERT INTO users
@@ -26,10 +18,10 @@ public class UserDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, userId);
-            stmt.setString(2, name);
-            stmt.setString(3, email);
-            stmt.setString(4, phone);
+            stmt.setString(1, user.getUserId());
+            stmt.setString(2, user.getName());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getPhone());
 
             return stmt.executeUpdate() > 0;
 
@@ -39,15 +31,14 @@ public class UserDAO {
         }
     }
 
-    // READ ALL
-    public List<String[]> getAllUsers() {
+    // READ
+    public List<User> getAllUsers() {
 
-        List<String[]> users = new ArrayList<>();
+        List<User> users = new ArrayList<>();
 
         String sql = """
             SELECT user_id, name, email, phone
             FROM users
-            ORDER BY user_id
             """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -56,12 +47,12 @@ public class UserDAO {
 
             while (rs.next()) {
 
-                String[] user = {
+                User user = new User(
                     rs.getString("user_id"),
                     rs.getString("name"),
                     rs.getString("email"),
                     rs.getString("phone")
-                };
+                );
 
                 users.add(user);
             }
@@ -73,8 +64,8 @@ public class UserDAO {
         return users;
     }
 
-    // READ ONE
-    public String[] getUserById(String userId) {
+    // READ ONE USER BY ID
+    public User getUserById(String userId) {
 
         String sql = """
             SELECT user_id, name, email, phone
@@ -91,12 +82,12 @@ public class UserDAO {
 
                 if (rs.next()) {
 
-                    return new String[]{
+                    return new User(
                         rs.getString("user_id"),
                         rs.getString("name"),
                         rs.getString("email"),
                         rs.getString("phone")
-                    };
+                    );
                 }
             }
 
@@ -108,27 +99,21 @@ public class UserDAO {
     }
 
     // UPDATE
-    public boolean updateUser(
-            String userId,
-            String name,
-            String email,
-            String phone) {
+    public boolean updateUser(User user) {
 
         String sql = """
             UPDATE users
-            SET name = ?,
-                email = ?,
-                phone = ?
+            SET name = ?, email = ?, phone = ?
             WHERE user_id = ?
             """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, name);
-            stmt.setString(2, email);
-            stmt.setString(3, phone);
-            stmt.setString(4, userId);
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPhone());
+            stmt.setString(4, user.getUserId());
 
             return stmt.executeUpdate() > 0;
 
