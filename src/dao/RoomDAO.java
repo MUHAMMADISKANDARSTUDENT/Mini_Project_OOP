@@ -1,185 +1,318 @@
-package dao;
-
-import database.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RoomDAO {
 
-    // CREATE
-    public boolean addRoom(
-            String roomId,
-            String roomNumber,
-            String roomType,
-            String bedType,
-            double basePrice,
-            String extraService,
-            int maxOccupancy) {
+    // =====================================================
+    // ADD ROOM
+    // =====================================================
+
+    public boolean addRoom(HotelRoom room) {
 
         String sql = """
             INSERT INTO rooms
-            (room_id, room_number, room_type, base_price,
-             bed_type, max_occupancy, extra_service)
+            (room_id, room_number, room_type, bed_type,
+             base_price, extra_charge, max_occupancy)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
 
-            stmt.setString(1, roomId);
-            stmt.setString(2, roomNumber);
-            stmt.setString(3, roomType);
-            stmt.setDouble(4, basePrice);
-            stmt.setString(5, bedType);
-            stmt.setInt(6, maxOccupancy);
-            stmt.setString(7, extraService);
+            pstmt.setString(
+                    1,
+                    room.getRoomId()
+            );
 
-            return stmt.executeUpdate() > 0;
+            pstmt.setString(
+                    2,
+                    room.getRoomNumber()
+            );
 
-        } catch (Exception e) {
+            // Determine room type
+            if (room instanceof DeluxeRoom) {
+                pstmt.setString(3, "Deluxe");
+            } else if (room instanceof StandardRoom) {
+                pstmt.setString(3, "Standard");
+            } else {
+                pstmt.setString(3, "HotelRoom");
+            }
+
+            pstmt.setString(
+                    4,
+                    room.getBedType()
+            );
+
+            pstmt.setDouble(
+                    5,
+                    room.getBasePrice()
+            );
+
+            pstmt.setDouble(
+                    6,
+                    room.getExtraCharge()
+            );
+
+            pstmt.setInt(
+                    7,
+                    room.getMaxOccupancy()
+            );
+
+            int rows =
+                    pstmt.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+
             e.printStackTrace();
+
             return false;
         }
     }
 
-    // READ ALL
-    public List<String[]> getAllRooms() {
+    // =====================================================
+    // GET ALL ROOMS
+    // =====================================================
 
-        List<String[]> rooms = new ArrayList<>();
+    public List<HotelRoom> getAllRooms() {
 
-        String sql = """
-            SELECT room_id, room_number, room_type, base_price,
-                   bed_type, max_occupancy, extra_service
-            FROM rooms
-            ORDER BY room_id
-            """;
+        List<HotelRoom> rooms =
+                new ArrayList<>();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String sql =
+                "SELECT * FROM rooms";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql);
+
+                ResultSet rs =
+                        pstmt.executeQuery()
+        ) {
 
             while (rs.next()) {
 
-                String[] room = {
-                    rs.getString("room_id"),
-                    rs.getString("room_number"),
-                    rs.getString("room_type"),
-                    rs.getString("bed_type"),
-                    String.valueOf(rs.getDouble("base_price")),
-                    rs.getString("extra_service"),
-                    String.valueOf(rs.getInt("max_occupancy"))
-                };
-
-                rooms.add(room);
+                rooms.add(
+                        createRoomFromResultSet(rs)
+                );
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
+
             e.printStackTrace();
         }
 
         return rooms;
     }
 
-    // READ ONE
-    public String[] getRoomById(String roomId) {
+    // =====================================================
+    // GET ROOM BY ID
+    // =====================================================
 
-        String sql = """
-            SELECT room_id, room_number, room_type, base_price,
-                   bed_type, max_occupancy, extra_service
-            FROM rooms
-            WHERE room_id = ?
-            """;
+    public HotelRoom getRoomById(
+            String roomId) {
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql =
+                "SELECT * FROM rooms "
+                + "WHERE room_id = ?";
 
-            stmt.setString(1, roomId);
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
 
-            try (ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setString(
+                    1,
+                    roomId
+            );
+
+            try (ResultSet rs =
+                    pstmt.executeQuery()) {
 
                 if (rs.next()) {
 
-                    return new String[]{
-                        rs.getString("room_id"),
-                        rs.getString("room_number"),
-                        rs.getString("room_type"),
-                        rs.getString("bed_type"),
-                        String.valueOf(rs.getDouble("base_price")),
-                        rs.getString("extra_service"),
-                        String.valueOf(rs.getInt("max_occupancy"))
-                    };
+                    return createRoomFromResultSet(rs);
                 }
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
+
             e.printStackTrace();
         }
 
         return null;
     }
 
-    // UPDATE
+    // =====================================================
+    // UPDATE ROOM
+    // =====================================================
+
     public boolean updateRoom(
-            String roomId,
-            String roomNumber,
-            String roomType,
-            String bedType,
-            double basePrice,
-            String extraService,
-            int maxOccupancy) {
+            HotelRoom room) {
 
         String sql = """
-            UPDATE rooms
-            SET room_number = ?,
-                room_type = ?,
-                base_price = ?,
-                bed_type = ?,
-                max_occupancy = ?,
-                extra_service = ?
+            UPDATE rooms SET
+            room_number = ?,
+            room_type = ?,
+            bed_type = ?,
+            base_price = ?,
+            extra_charge = ?,
+            max_occupancy = ?
             WHERE room_id = ?
             """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
 
-            stmt.setString(1, roomNumber);
-            stmt.setString(2, roomType);
-            stmt.setDouble(3, basePrice);
-            stmt.setString(4, bedType);
-            stmt.setInt(5, maxOccupancy);
-            stmt.setString(6, extraService);
-            stmt.setString(7, roomId);
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
 
-            return stmt.executeUpdate() > 0;
+            if (room instanceof DeluxeRoom) {
+                pstmt.setString(2, "Deluxe");
+            } else {
+                pstmt.setString(2, "Standard");
+            }
 
-        } catch (Exception e) {
+            pstmt.setString(
+                    1,
+                    room.getRoomNumber()
+            );
+
+            pstmt.setString(
+                    3,
+                    room.getBedType()
+            );
+
+            pstmt.setDouble(
+                    4,
+                    room.getBasePrice()
+            );
+
+            pstmt.setDouble(
+                    5,
+                    room.getExtraCharge()
+            );
+
+            pstmt.setInt(
+                    6,
+                    room.getMaxOccupancy()
+            );
+
+            pstmt.setString(
+                    7,
+                    room.getRoomId()
+            );
+
+            int rows =
+                    pstmt.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+
             e.printStackTrace();
+
             return false;
         }
     }
 
-    // DELETE
-    public boolean deleteRoom(String roomId) {
+    // =====================================================
+    // DELETE ROOM
+    // =====================================================
 
-        String sql = """
-            DELETE FROM rooms
-            WHERE room_id = ?
-            """;
+    public boolean deleteRoom(
+            String roomId) {
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql =
+                "DELETE FROM rooms "
+                + "WHERE room_id = ?";
 
-            stmt.setString(1, roomId);
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
 
-            return stmt.executeUpdate() > 0;
+                PreparedStatement pstmt =
+                        conn.prepareStatement(sql)
+        ) {
 
-        } catch (Exception e) {
+            pstmt.setString(
+                    1,
+                    roomId
+            );
+
+            int rows =
+                    pstmt.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+
             e.printStackTrace();
+
             return false;
+        }
+    }
+
+    // =====================================================
+    // CREATE DOMAIN OBJECT
+    // =====================================================
+
+    private HotelRoom createRoomFromResultSet(
+            ResultSet rs) throws SQLException {
+
+        String roomId =
+                rs.getString("room_id");
+
+        String roomNumber =
+                rs.getString("room_number");
+
+        String roomType =
+                rs.getString("room_type");
+
+        String bedType =
+                rs.getString("bed_type");
+
+        double basePrice =
+                rs.getDouble("base_price");
+
+        int maxOccupancy =
+                rs.getInt("max_occupancy");
+
+        if (roomType.equalsIgnoreCase("Deluxe")) {
+
+            return new DeluxeRoom(
+                    roomId,
+                    roomNumber,
+                    basePrice,
+                    bedType,
+                    maxOccupancy
+            );
+
+        } else {
+
+            return new StandardRoom(
+                    roomId,
+                    roomNumber,
+                    basePrice,
+                    bedType,
+                    maxOccupancy
+            );
         }
     }
 }
